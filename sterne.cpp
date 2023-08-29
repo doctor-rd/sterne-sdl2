@@ -5,6 +5,10 @@
 #include <vector>
 #include <SDL.h>
 #include <SDL_opengles2.h>
+#ifdef __EMSCRIPTEN__
+#include "imgui/examples/libs/emscripten/emscripten_mainloop_stub.h"
+#endif
+
 
 typedef struct {
   GLfloat x;
@@ -89,7 +93,12 @@ int main() {
 
     bool done = false;
     Uint32 then = 0;
+#ifdef __EMSCRIPTEN__
+    io.IniFilename = nullptr;
+    EMSCRIPTEN_MAINLOOP_BEGIN
+#else
     while (!done)
+#endif
     {
         Uint32 now = SDL_GetTicks();
         double deltaTime = (now - then)/1000.0;
@@ -146,6 +155,9 @@ int main() {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }
+#ifdef __EMSCRIPTEN__
+    EMSCRIPTEN_MAINLOOP_END;
+#endif
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
